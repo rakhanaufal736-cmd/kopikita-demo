@@ -1,6 +1,6 @@
 # Kopi Kita
 
-Kopi Kita mencatat penjualan dan stok bahan sekaligus. Tiap penjualan memotong stok sesuai resep, bahan yang hampir kedaluwarsa dipakai duluan, dan aplikasi menyarankan apa yang perlu dipesan.
+Aplikasi kasir dan stok bahan untuk kedai kopi kecil. Tiap penjualan memotong stok sesuai resep, bahan yang hampir kedaluwarsa dipakai duluan, dan aplikasi menyarankan apa yang perlu dipesan.
 
 **Demo:** https://rakhanaufal736-cmd.github.io/kopikita-demo/
 
@@ -9,29 +9,39 @@ Kopi Kita mencatat penjualan dan stok bahan sekaligus. Tiap penjualan memotong s
 | Admin | `admin` | `admin1234` |
 | Kasir | `kasir` | `kasir1234` |
 
-*Catatan: Di halaman login, tersedia tombol untuk masuk secara instan.*
+Di halaman login ada tombol untuk masuk langsung.
 
-## Tentang Demo Ini
+## Soal demo ini
 
-Versi yang Anda coba ini hanya menjalankan sisi frontend saja. Karena tidak ada server, semua panggilan ke `/api/*` ditangani oleh `demo-api.js` dan datanya disimpan di `localStorage` browser Anda. Hal ini berarti data tidak tersinkronisasi antar perangkat dan akan hilang jika data browser dihapus. Jika ingin mengembalikan data ke kondisi awal, gunakan fitur "Reset data contoh" di menu Pengaturan.
+Ini versi frontend saja. Tidak ada server. Panggilan ke `/api/*` ditangani `demo-api.js`, dan datanya disimpan di `localStorage` browser kamu. Jadi data tidak ke mana-mana, tidak ikut ke perangkat lain, dan hilang kalau data browser dihapus. Pengaturan → "Reset data contoh" mengembalikan semuanya ke awal.
 
-Sebagai informasi, versi aslinya berjalan di Node.js dengan SQLite tanpa dependensi npm, serta sudah mendukung sistem login dan sinkronisasi antar-perangkat. Kode servernya sendiri tidak disertakan dalam repositori ini.
+Versi aslinya jalan di Node.js dengan SQLite, tanpa dependensi npm, dengan login dan sinkron antar-perangkat. Kode server tidak ada di repo ini.
 
-## Fitur Utama
+## Yang bisa dilakukan
 
-- **Kasir:** Melayani pemesanan lengkap (pilih menu, ukuran, ekstra shot, catatan, diskon), pilihan pembayaran (tunai atau QRIS), serta manajemen buka/tutup shift.
-- **Stok:** Pencatatan bahan per batch dengan sistem FEFO (*First Expired, First Out*). Tersedia juga fitur pencatatan *waste* dan stok opname.
-- **Pembelian:** Sistem memberikan saran pemesanan berdasarkan pemakaian (menggunakan perhitungan *safety stock*, titik pesan ulang, dan EOQ), yang kemudian bisa langsung dijadikan PO ke supplier.
-- **Laporan:** Analisis persediaan dan laporan penjualan per periode.
-- **Hak Akses:** Admin memiliki kontrol penuh atas menu, pengaturan, pengguna, dan persetujuan opname, sementara kasir memiliki akses terbatas.
+- **Kasir:** pilih menu, ukuran, extra shot, catatan, diskon, bayar tunai atau QRIS, buka dan tutup shift
+- **Stok:** tiap bahan dicatat per batch, yang lebih dulu kedaluwarsa dipakai lebih dulu (FEFO). Ada pencatatan waste dan stok opname
+- **Pembelian:** saran pesan dihitung dari pemakaian (safety stock, titik pesan ulang, EOQ), lalu bisa dijadikan PO ke supplier
+- **Laporan:** penjualan per periode dan analisis persediaan
+- **Peran:** admin bisa ubah menu, pengaturan, pengguna, dan menyetujui opname. Kasir tidak
 
-Setiap kali terjadi penjualan, stok akan berkurang secara otomatis berdasarkan resep yang telah diatur.
+## Cara kerjanya
 
-## Cara Kerja Sistem
-
-Data disimpan dalam format dokumen per kunci (seperti `ing`, `bat`, `menu`, `ord:2026-11`, dan seterusnya), di mana setiap dokumen memiliki nomor revisi. Jika ada dua perangkat yang mencoba mengubah dokumen yang sama secara bersamaan, perubahan kedua akan ditolak dengan status 409, lalu data akan dimuat ulang. Dalam demo ini, aturan tersebut dijalankan melalui `demo-api.js`.
+Semua data disimpan sebagai dokumen per kunci (`ing`, `bat`, `menu`, `ord:2026-11`, dan seterusnya), tiap dokumen punya nomor revisi. Kalau dua perangkat mengubah dokumen yang sama, yang kedua ditolak dengan status 409 lalu data dimuat ulang. Di demo, aturan ini dijalankan ulang oleh `demo-api.js`.
 
 ## Batasan
 
-- Perhitungan stok dan harga masih dilakukan di sisi browser dikarenakan ini versi demo. Pada versi server, hal ini bertujuan mencegah manipulasi angka oleh pengguna. Untuk skala satu coffee shop dengan staf terpercaya, metode ini sudah cukup, namun untuk skala yang lebih besar, logika ini harus dipindahkan ke server.
-- Aplikasi ini cocok untuk satu outlet dengan beberapa perangkat. Saat ini belum tersedia mode offline, fitur cetak struk thermal, fungsi
+- Hitungan stok dan harga jalan di browser. Di versi dengan server, kasir yang sengaja curang masih bisa mengirim angka palsu. Untuk satu kedai dengan staf yang dipercaya ini cukup. Untuk lebih dari itu, logikanya harus pindah ke server.
+- Cocok untuk satu outlet dengan beberapa perangkat. Belum ada mode offline, cetak struk thermal, void/refund, dan log audit.
+
+## Jalankan sendiri
+
+```bash
+python3 -m http.server 8000
+```
+
+Buka http://localhost:8000.
+
+## Lisensi
+
+MIT. Lihat `LICENSE`.
